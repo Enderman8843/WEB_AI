@@ -8,14 +8,28 @@
   
 
 }
-.body{
-  overflow-x: hidden;
-}
+
 .card {
   border-radius: 20px;
-  border-width: 30;
+
   border-color:white;
   border-style:solid;
   color:white;
   padding:1rem;
 }
+
+.input_card {
+  border-radius: 20px;
+  border-color:white;
+  border-style:solid;
+  margin-top: 1rem;
+  color:white;
+  padding:0.7rem;
+}
+.input {
+  width:100%;
+  outline:none; 
+  border:none;
+  background-color: #242424;
+}
+
