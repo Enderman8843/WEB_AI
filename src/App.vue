@@ -3,6 +3,7 @@ import Chatbox from './components/Chat.vue';
 import history_element from './components/history_element.vue';
 import * as webllm from "@mlc-ai/web-llm";
 import 'material-icons/iconfont/material-icons.css';
+import chat_element from './components/chat_element.vue';
 import { ref, onMounted } from "vue";
 
 
@@ -11,36 +12,34 @@ const messages = ref([]);
 const engine = ref(null);
 
 
-const selectedModel = "Llama-3-8B-Instruct-q4f16_1-MLC";
+const selectedModel = "SmolLM2-1.7B-Instruct-q4f16_1-MLC";
 
-// onMounted(async () => {
-//   console.log("Available models:", webllm.prebuiltAppConfig.model_list);
-//   engine.value = await webllm.CreateMLCEngine(selectedModel, {
-//     progressCallback: (p) => console.log("Loading:", p)
-//   });
-//   console.log("Model loaded!");
-// });
+const dummy_msg = [
+  { person: "User", personi: "This is AI!" },
+  { peson: "AI", personi: "This is not AI"}
+]
 
-// const sendmsg = async () => {
-//   if (!input.value.trim() || !engine.value) return;
+onMounted(async () => {
+  try {
+    console.log("Intializing AI")
+    const initProgressCallback = (report) => {
+      ProgressEvent.value =report.progress;
+      console.log(`loading: ${report.progress} `)
 
-//   // Add user message to UI
-//   const userMessage = input.value;
-//   messages.value.push({ sender: 'User', text: userMessage });
-//   input.value = "";
+      engine.value = await webllm.CreateMLCEngine(
+        selectedModel,
+        { initProgressCallback }
+      );
 
-//   try {
-//     const reply = await engine.value.chat.completions.create({
-//       messages: [{ role: "user", content: userMessage }]
-//     });
-
-//     const aiText = reply.choices[0].message.content;
-//     messages.value.push({ sender: 'AI', text: aiText });
-//   } catch (err) {
-//     console.error("Chat error:", err);
-//   }
-// };
-// Dosen't Work
+      loading.value = false;
+      console.log('sucess')
+    }
+  }catch (err){
+    console.error(err);
+  }
+}
+   
+)
 </script>
 
 <template>
@@ -49,28 +48,31 @@ const selectedModel = "Llama-3-8B-Instruct-q4f16_1-MLC";
   </header>
 
   <div style="display: flex; flex-direction: row;">
-    <!-- Sidebar history -->
     <div class="card" style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 80vh">
       <history_element Heading="Random" Subject="Random Chat" />
     </div>
 
-    <!-- Main chat area -->
+    
     <div style="display: flex; flex-direction: column;">
-      <!-- Chat messages -->
-      <div class="card" style="height: 70vh; width: 75vw; overflow-y: auto; padding: 1rem;">
-        <div v-for="(msg, idx) in messages" :key="idx" :style="{ textAlign: msg.sender === 'User' ? 'right' : 'left' }">
-          <b>{{ msg.sender }}:</b> {{ msg.text }}
-        </div>
+   
+      <div class="card" style=" width: 75vw; height:70vh; overflow-y: scroll; padding: 1rem;">
+        
+        <chat_element
+      v-for="(msg, index) in dummy_msg"
+      :key="index"
+      :person="msg.person"
+      :personi="msg.personi"
+    />
       </div>
 
-      <!-- Input bar -->
+    
       <div class="input_card" style="display: flex; flex-direction: row; align-items: center;">
         <input
           v-model="input"
           @keyup.enter="sendmsg"
           placeholder="Enter the message!"
           class="input"
-          style="flex: 1; padding: 0.5rem;"
+          style="flex: 1; padding: 0.25rem;"
         />
         <button @click="sendmsg" style="border: none; background-color: #242424; color: white; padding: 0.5rem;">
           <span class="material-icons">arrow_forward_ios</span>
@@ -80,26 +82,4 @@ const selectedModel = "Llama-3-8B-Instruct-q4f16_1-MLC";
   </div>
 </template>
 
-<style>
-body {
-  background-color: #121212;
-  font-family: sans-serif;
-}
 
-.card {
-  background-color: #1e1e1e;
-  border-radius: 12px;
-  color: white;
-}
-
-.input {
-  background-color: #2c2c2c;
-  border: none;
-  color: white;
-  border-radius: 8px;
-}
-
-.input_card {
-  margin-top: 0.5rem;
-}
-</style>
