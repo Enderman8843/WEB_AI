@@ -1,103 +1,133 @@
 <script setup>
-import Chatbox from './components/Chat.vue';
-import history_element from './components/history_element.vue';
-import * as webllm from "@mlc-ai/web-llm";
-import 'material-icons/iconfont/material-icons.css';
-import chat_element from './components/chat_element.vue';
-import { ref, onMounted } from "vue";
-
-const input = ref("");
-const messages = ref([]);
-const engine = ref(null);
-const visible = ref(true); // show popup on load
-const gpuinfo = ref("Detecting GPU...");
-const supported = ref(false);
-
-const selectedModel = "SmolLM2-1.7B-Instruct-q4f16_1-MLC";
-
-const dummy_msg = [
-  { person: "User", personi: "This is AI!" },
-  { person: "AI", personi: "This is not AI" }
-];
-
-function closePopup() {
-  visible.value = false;
-}
-
-function leaveSite() {
-  window.location.href = "https://www.google.com"; // redirect if not supported
-}
-
-onMounted(() => {
-
-  const ua = navigator.userAgent;
-  const match = ua.match(/Chrom(e|ium)\/([0-9]+)\./);
-  const chromeVersion = match ? parseInt(match[2], 10) : 0;
+import history_element from './components/history_element.vue'
+import chat_element from './components/chat_element.vue'
+import 'material-icons/iconfont/material-icons.css'
+import { ref, onMounted } from 'vue'
+import { CreateMLCEngine } from '@mlc-ai/web-llm'
 
 
-  let gl = document.createElement("canvas").getContext("webgl");
-  let debugInfo = gl?.getExtension("WEBGL_debug_renderer_info");
-  let renderer = gl?.getParameter(debugInfo?.UNMASKED_RENDERER_WEBGL) || "Unknown GPU";
+const MODEL = 'SmolLM2-1.7B-Instruct-q4f16_1-MLC'
+
+const input    = ref('')
+const messages = ref([])
+const loading  = ref(true)
+const progress = ref(0)
+const isStreaming = ref(false)
 
 
-  if (chromeVersion >= 113) {
-    gpuinfo.value = `GPU Detected: ${renderer} \nBrowser Version: ${chromeVersion} ✅ Supported`;
-    supported.value = true;
-  } else {
-    gpuinfo.value = `GPU Detected: ${renderer} \nBrowser Version: ${chromeVersion} ❌ Not Supported`;
-    supported.value = false;
+let engine = null
+let currentStream = null  
+let stopRequested = false  
+
+onMounted(async () => {
+  try {
+    const initProgressCallback = (report) => {
+      const val = typeof report === 'number'
+        ? report
+        : (typeof report?.progress === 'number' ? report.progress : 0)
+      progress.value = Math.round(val <= 1 ? val * 100 : val)
+    }
+
+    engine = await CreateMLCEngine(MODEL, { initProgressCallback })
+    loading.value = false
+  } catch (err) {
+    console.error('Engine init failed:', err)
   }
-});
+})
+
+
+function stop() {
+  stopRequested = true
+  isStreaming.value = false
+  console.log(' I had loved her')
+}
+
+
+async function sendmsg () {
+  const text = input.value.trim()
+  if (!text || !engine || isStreaming.value) return
+
+  messages.value.push({ person: 'User', personi: text })
+  input.value = ''
+
+  const chatMessages = messages.value.map(m => ({
+    role: m.person === 'User' ? 'user' : 'assistant',
+    content: m.personi
+  }))
+
+  let reply = ''
+  messages.value.push({ person: 'AI', personi: '' })
+  const aiIndex = messages.value.length - 1
+
+  try {
+    stopRequested = false
+    isStreaming.value = true
+
+    currentStream = await engine.chat.completions.create({
+      messages: chatMessages,
+      stream: true
+    })
+
+    for await (const chunk of currentStream) {
+      if (stopRequested) break
+      const delta = chunk.choices?.[0]?.delta?.content || ''
+      if (delta) {
+        reply += delta
+        messages.value[aiIndex].personi = reply
+      }
+    }
+  } catch (err) {
+    console.error('Chat failed:', err)
+    messages.value[aiIndex].personi = '(error generating response)'
+  } finally {
+    isStreaming.value = false
+    currentStream = null
+  }
+}
 </script>
 
 <template>
-  <header style="border-radius: 20px; border-width: 30; border-color:white; border-style: solid; color: white; padding: 1rem;">
+  <header
+    style="border-radius: 20px; border-width: 2px; border-color: white; border-style: solid; color: white; padding: 1rem;"
+  >
     <a>WEB - AI</a>
+    <span v-if="loading"> — loading {{ progress }}%</span>
   </header>
 
-  <div v-if="visible" class="overlay">
-    <div v-if="visible" class="popup-content">
-      <span class="close" @click="closePopup">&times;</span>
-      <h2>GPU CHECK</h2>
-      <p>{{ gpuinfo }}</p>
-
-      <div v-if="supported">
-        <button @click="closePopup" style="margin-top:10px; padding:8px; background:#242424; color:white; border:none; border-radius:8px;">Continue</button>
-      </div>
-      <div v-else>
-        <button @click="leaveSite" style="margin-top:10px; padding:8px; background:red; color:white; border:none; border-radius:8px;">Leave Site</button>
-      </div>
-    </div>
-  </div>
-
   <div style="display: flex; flex-direction: row;">
-    <div class="card" style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 80vh">
+
+    <div class="card"
+         style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 80vh">
       <history_element Heading="Random" Subject="Random Chat" />
     </div>
 
-    <div style="display: flex; flex-direction: column;">
-      <div class="card" style=" width: 75vw; height:70vh; overflow-y: scroll; padding: 1rem;">
+  
+    <div style="display: flex; flex-direction: column; flex: 1;">
+      <div class="card"
+           style="width: 75vw; height: 70vh; overflow-y: scroll; padding: 1rem;">
         <chat_element
-          v-for="(msg, index) in dummy_msg"
+          v-for="(msg, index) in messages"
           :key="index"
           :person="msg.person"
           :personi="msg.personi"
         />
       </div>
 
-      <div class="input_card" style="display: flex; flex-direction: row; align-items: center;">
+      <div class="input_card"
+           style="display: flex; flex-direction: row; align-items: center; gap: 0.5rem;">
         <input
           v-model="input"
           @keyup.enter="sendmsg"
           placeholder="Enter the message!"
           class="input"
           style="flex: 1; padding: 0.25rem;"
+          :disabled="loading || isStreaming"
         />
-        <button @click="sendmsg" style="border: none; background-color: #242424; color: white; padding: 0.5rem;">
+        <button @click="sendmsg" :disabled="loading || isStreaming" style="border: none; background-color: #242424; color: white; padding: 0.5rem;">
           <span class="material-icons">arrow_forward_ios</span>
         </button>
+
       </div>
     </div>
   </div>
 </template>
-
