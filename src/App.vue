@@ -4,10 +4,12 @@ import chat_element from './components/chat_element.vue'
 import 'material-icons/iconfont/material-icons.css'
 import { ref, onMounted } from 'vue'
 import { CreateMLCEngine } from '@mlc-ai/web-llm'
+import { useRoute, useRouter } from 'vue-router'
 
 
-const MODEL = 'SmolLM2-1.7B-Instruct-q4f16_1-MLC'
-
+const route = useRoute()
+const MODEL = route.query.model || ''
+ 
 const input    = ref('')
 const messages = ref([])
 const loading  = ref(true)
@@ -34,6 +36,8 @@ onMounted(async () => {
     console.error('Engine init failed:', err)
   }
 })
+
+
 
 
 function stop() {
