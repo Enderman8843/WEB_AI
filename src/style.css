@@ -49,6 +49,14 @@
   color:white;
   padding:1rem;
 }
+.his_card {
+  border-radius: 20px;
+  margin-top: 10px;
+  border-color:white;
+  border-style:solid;
+  color:white;
+ 
+}
 
 .input_card {
   border-radius: 20px;

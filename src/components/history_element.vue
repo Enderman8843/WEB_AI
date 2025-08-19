@@ -8,7 +8,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="card" style="width:88%; height:10%">
+  <div class="card"  style="margin:10px; width:80%; height:10%;  padding:1rem;">
     {{Heading}}
     {{ Subject }}
 

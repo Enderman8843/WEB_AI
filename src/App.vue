@@ -2,17 +2,18 @@
 import history_element from './components/history_element.vue'
 import chat_element from './components/chat_element.vue'
 import 'material-icons/iconfont/material-icons.css'
-import { ref, onMounted } from 'vue'
-import { CreateMLCEngine } from '@mlc-ai/web-llm'
+import { ref, onMounted, watch } from 'vue'
+import { CreateMLCEngine,  prebuiltAppConfig } from '@mlc-ai/web-llm'
 import { useRoute, useRouter } from 'vue-router'
 
 
 const route = useRoute()
-const MODEL = route.query.model || ''
- 
+const MODEL = route.query.model || 'SmolLM2-1.7B-Instruct-q4f16_1-MLC'
+const router = useRouter()
 const input    = ref('')
 const messages = ref([])
 const loading  = ref(true)
+const selectedModel = ref('')
 const progress = ref(0)
 const isStreaming = ref(false)
 
@@ -20,26 +21,92 @@ const isStreaming = ref(false)
 let engine = null
 let currentStream = null  
 let stopRequested = false  
+const modelList = ref([])  
+
+
 
 onMounted(async () => {
-  try {
+
+  modelList.value = prebuiltAppConfig.model_list.map(m => m.model_id)
+  selectedModel.value = route.query.model || modelList.value[0] || ''
+
+
+  if (!selectedModel.value) {
+    loading.value = false
+    return
+  }
+
+
+  watch(
+  () => route.query.model,          // reactive source
+  async (newModel) => {
+    if (!newModel || !modelList.value.includes(newModel)) return
+
+    selectedModel.value = newModel
+    loading.value = true
+    progress.value = 0
+
+    
+    if (engine) await engine.unload?.()
+
+    
     const initProgressCallback = (report) => {
-      const val = typeof report === 'number'
-        ? report
-        : (typeof report?.progress === 'number' ? report.progress : 0)
+      const val =
+        typeof report === 'number'
+          ? report
+          : typeof report?.progress === 'number'
+          ? report.progress
+          : 0
       progress.value = Math.round(val <= 1 ? val * 100 : val)
     }
 
-    engine = await CreateMLCEngine(MODEL, { initProgressCallback })
-    loading.value = false
+    try {
+      engine = await CreateMLCEngine(newModel, { initProgressCallback })
+    } catch (err) {
+      console.error('Engine init failed:', err)
+    } finally {
+      loading.value = false
+    }
+  },
+  { immediate: true }            
+)
+
+
+async function onModelChange(newModel) {
+  await router.replace({ query: { model: newModel } })
+
+}
+
+  const initProgressCallback = (report) => {
+    const val =
+      typeof report === 'number'
+        ? report
+        : typeof report?.progress === 'number'
+        ? report.progress
+        : 0
+    progress.value = Math.round(val <= 1 ? val * 100 : val)
+  }
+
+  try {
+    engine = await CreateMLCEngine(selectedModel.value, { initProgressCallback })
   } catch (err) {
     console.error('Engine init failed:', err)
+  } finally {
+    loading.value = false
   }
 })
+async function onModelChange(newModel) {
+  await router.replace({ query: { model: newModel } })
+  
+}
 
-
-
-
+onMounted(async () => {
+  try {
+    modelList.value = webllm.prebuiltAppConfig.model_list.map(m => m.model_id)
+    if (!MODEL && modelList.value.length) selectedModel.value = modelList.value[0]
+  } catch { "I had loved her !," }
+}
+)
 function stop() {
   stopRequested = true
   isStreaming.value = false
@@ -96,12 +163,22 @@ async function sendmsg () {
   >
     <a>WEB - AI</a>
     <span v-if="loading"> — loading {{ progress }}%</span>
+    
   </header>
 
   <div style="display: flex; flex-direction: row;">
 
-    <div class="card"
-         style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 80vh">
+    <div class="his_card"
+         style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 86vh;">
+         <div style="margin:10px; width:80%; height:5%;  padding:1rem;" class="card">  
+          <select
+           v-model="selectedModel" 
+           :disabled="loading || isStreaming"
+           @change="onModelChange(selectedModel)">
+
+    <option v-for="m in modelList" :key="m" :value="m">{{ m }}</option>
+  </select></div>
+         <div style="background-color:white; height:1px"></div>
       <history_element Heading="Random" Subject="Random Chat" />
     </div>
 
