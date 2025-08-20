@@ -38,7 +38,7 @@ onMounted(async () => {
 
 
   watch(
-  () => route.query.model,          // reactive source
+  () => route.query.model,          
   async (newModel) => {
     if (!newModel || !modelList.value.includes(newModel)) return
 
@@ -72,10 +72,6 @@ onMounted(async () => {
 )
 
 
-async function onModelChange(newModel) {
-  await router.replace({ query: { model: newModel } })
-
-}
 
   const initProgressCallback = (report) => {
     const val =
@@ -95,23 +91,7 @@ async function onModelChange(newModel) {
     loading.value = false
   }
 })
-async function onModelChange(newModel) {
-  await router.replace({ query: { model: newModel } })
-  
-}
 
-onMounted(async () => {
-  try {
-    modelList.value = webllm.prebuiltAppConfig.model_list.map(m => m.model_id)
-    if (!MODEL && modelList.value.length) selectedModel.value = modelList.value[0]
-  } catch { "I had loved her !," }
-}
-)
-function stop() {
-  stopRequested = true
-  isStreaming.value = false
-  console.log(' I had loved her')
-}
 
 
 async function sendmsg () {
