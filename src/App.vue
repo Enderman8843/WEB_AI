@@ -2,14 +2,14 @@
 import history_element from './components/history_element.vue'
 import chat_element from './components/chat_element.vue'
 import 'material-icons/iconfont/material-icons.css'
-import { ref, onMounted, watch } from 'vue'
 import { CreateMLCEngine,  prebuiltAppConfig } from '@mlc-ai/web-llm'
+
+import { ref, onMounted } from 'vue'
+
 import { useRoute, useRouter } from 'vue-router'
 
 
-const route = useRoute()
-const MODEL = route.query.model || 'SmolLM2-1.7B-Instruct-q4f16_1-MLC'
-const router = useRouter()
+
 const input    = ref('')
 const messages = ref([])
 const loading  = ref(true)
@@ -22,54 +22,60 @@ let engine = null
 let currentStream = null  
 let stopRequested = false  
 const modelList = ref([])  
+const route = useRoute()
+const router = useRouter()
+
+function onModelChange(model) {
+  router.push({
+    query: {
+      ...route.query,
+      model
+    }
+  })
+}
+
+
+
+function formatModelName(model) {
+
+  const parts = model.split('-')
+
+
+  const quantPart = parts.find(p => p.startsWith('q')) || ''
+
+ 
+  let baseName = parts[0]
+  if (parts[1] && /\d/.test(parts[1])) {
+    baseName += '-' + parts[1]
+  }
+
+  return `${baseName}   |   ${quantPart}`
+}
 
 
 
 onMounted(async () => {
 
   modelList.value = prebuiltAppConfig.model_list.map(m => m.model_id)
-  selectedModel.value = route.query.model || modelList.value[0] || ''
+  selectedModel.value = route.query.model || modelList.value[35] 
+  
+  if (route.query.chat) {
+    try {
+      messages.value = JSON.parse(atob(route.query.chat))
+    } catch (err) {
+      console.error('Failed to decode chat:', err)
+    }
+  }
 
 
+  console.log('loadingggggggggggggggggggggg')
   if (!selectedModel.value) {
     loading.value = false
     return
   }
 
 
-  watch(
-  () => route.query.model,          
-  async (newModel) => {
-    if (!newModel || !modelList.value.includes(newModel)) return
 
-    selectedModel.value = newModel
-    loading.value = true
-    progress.value = 0
-
-    
-    if (engine) await engine.unload?.()
-
-    
-    const initProgressCallback = (report) => {
-      const val =
-        typeof report === 'number'
-          ? report
-          : typeof report?.progress === 'number'
-          ? report.progress
-          : 0
-      progress.value = Math.round(val <= 1 ? val * 100 : val)
-    }
-
-    try {
-      engine = await CreateMLCEngine(newModel, { initProgressCallback })
-    } catch (err) {
-      console.error('Engine init failed:', err)
-    } finally {
-      loading.value = false
-    }
-  },
-  { immediate: true }            
-)
 
 
 
@@ -93,6 +99,25 @@ onMounted(async () => {
 })
 
 
+
+function shareChat(){
+  const data = {
+    model: selectedModel.value,
+    messages: messages.value
+  }
+
+  const url = new URL(window.location.href)
+  url.searchParams.set('model', selectedModel.value)
+  url.searchParams.set('chat', btoa(JSON.stringify(data.messages)))
+
+  navigator.clipboard.writeText(url.toString())
+    .then(() => {
+      alert('Link copied! Share it with others.')
+    })
+    .catch(err => {
+      console.error('Failed to copy:', err)
+    })
+}
 
 async function sendmsg () {
   const text = input.value.trim()
@@ -139,24 +164,33 @@ async function sendmsg () {
 
 <template>
   <header
-    style="border-radius: 20px; border-width: 2px; border-color: white; border-style: solid; color: white; padding: 1rem;"
+    style="display:flex; flex-direction: row; border-radius: 20px; border-width: 2px; border-color: white; border-style: solid; color: white; padding:0.5rem;"
   >
-    <a>WEB - AI</a>
-    <span v-if="loading"> — loading {{ progress }}%</span>
-    
+    <a style="margin:0.2rem">WEB - AI</a>
+   
+    <div style="width:95%; display:flex; justify-content:flex-end;">
+      <span style="margin:0.2rem" v-if="loading"> Loading {{ progress }}%</span>
+  <button @click="shareChat" 
+          style="border:none; background-color:#242424; color:white; padding:0.2rem; border-radius:8px; cursor:pointer;">
+    <span class="material-icons">ios_share</span>
+  </button>
+</div>
+
   </header>
 
   <div style="display: flex; flex-direction: row;">
 
     <div class="his_card"
          style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 86vh;">
-         <div style="margin:10px; width:80%; height:5%;  padding:1rem;" class="card">  
+         <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;" class=""> 
+          <a>Select Model</a> 
           <select
+          class="model-select"
            v-model="selectedModel" 
            :disabled="loading || isStreaming"
            @change="onModelChange(selectedModel)">
 
-    <option v-for="m in modelList" :key="m" :value="m">{{ m }}</option>
+    <option v-for="m in modelList" :key="m" :value="m">{{ formatModelName(m) }}</option>
   </select></div>
          <div style="background-color:white; height:1px"></div>
       <history_element Heading="Random" Subject="Random Chat" />
@@ -184,7 +218,7 @@ async function sendmsg () {
           style="flex: 1; padding: 0.25rem;"
           :disabled="loading || isStreaming"
         />
-        <button @click="sendmsg" :disabled="loading || isStreaming" style="border: none; background-color: #242424; color: white; padding: 0.5rem;">
+        <button @click="sendmsg" :disabled="loading || isStreaming" style="border: none; background-color: #242424; color: white; padding: 0.2rem;">
           <span class="material-icons">arrow_forward_ios</span>
         </button>
 

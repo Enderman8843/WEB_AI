@@ -58,6 +58,25 @@
  
 }
 
+.model-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #666;
+  background: #222;
+  color: white;
+  font-family: monospace;
+  font-size: 14px;
+  width: 90%;
+}
+
+
+.model-select option {
+  padding: 6px 10px;
+  font-family: monospace;
+  font-size: 14px;
+  color: white;
+}
+
 .input_card {
   border-radius: 20px;
   border-color:white;
