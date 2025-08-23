@@ -65,6 +65,11 @@ function formatModelName(model) {
 
 onMounted(async () => {
 
+  const parms = new URLSearchParams(window.location.searc)
+  if (parms.get('model')){
+    this.selectedModel = params.get('model');
+  }
+
   modelList.value = prebuiltAppConfig.model_list.map(m => m.model_id)
   selectedModel.value = route.query.model || modelList.value[35] 
   
@@ -107,6 +112,12 @@ onMounted(async () => {
   }
 })
 
+
+function newModel(model){
+  if (model)
+    window.location.href =  `${window.location.origin}${window.location.pathname}?model=${model}`
+  
+} 
 
 
 function shareChat(){
@@ -197,7 +208,7 @@ async function sendmsg () {
           class="model-select"
            v-model="selectedModel" 
            :disabled="loading || isStreaming"
-           @change="onModelChange(selectedModel)">
+           @change="newModel(selectedModel)">
 
     <option v-for="m in modelList" :key="m" :value="m">{{ formatModelName(m) }}</option>
   </select></div>
