@@ -184,7 +184,7 @@ async function sendmsg () {
 
 <template>
   <header
-    style="display:flex; flex-direction: row; border-radius: 20px; border-width: 2px; border-color: white; border-style: solid; color: white; padding:0.5rem;"
+    style="display:flex; flex-direction: row; border-radius: 13px; border-width: 2px; border-color: white; border-style: solid; color: white; padding:0.5rem;"
   >
     <a style="margin:0.2rem">WEB - AI</a>
    
@@ -199,7 +199,7 @@ async function sendmsg () {
   </header>
 
   <div style="display: flex; flex-direction: row;">
-
+   
     <div class="his_card"
          style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 86vh;">
          <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;" class=""> 
@@ -219,7 +219,7 @@ async function sendmsg () {
   
     <div style="display: flex; flex-direction: column; flex: 1;">
       <div class="card"
-           style="width: 75vw; height: 70vh; overflow-y: scroll; padding: 1rem;">
+           style="width: 75vw; height: 70vh; scrollbar-width: none; overflow-y: scroll; padding: 1rem;">
         <chat_element
           v-for="(msg, index) in messages"
           :key="index"
@@ -238,8 +238,8 @@ async function sendmsg () {
           style="flex: 1; padding: 0.25rem;"
           :disabled="loading || isStreaming"
         />
-        <button @click="sendmsg" :disabled="loading || isStreaming" style="border: none; background-color: #242424; color: white; padding: 0.2rem;">
-          <span class="material-icons">arrow_forward_ios</span>
+        <button @click="() => isStreaming ? engine.interruptGenerate() : sendmsg()" :disabled="loading" style="border: none; background-color: #242424; color: white; padding: 0.2rem;">
+          <span class="material-icons"> {{ isStreaming ? 'stop_circle' : 'arrow_forward_ios' }}</span>
         </button>
 
       </div>

@@ -43,7 +43,7 @@
 
 .card {
   border-radius: 13px;
-  margin-top: 10px;
+  margin-top: 12px;
   border-color:white;
   border-style:solid;
   color:white;
@@ -51,7 +51,7 @@
 }
 .his_card {
   border-radius: 13px;
-  margin-top: 10px;
+  margin-top: 12px;
   border-color:white;
   border-style:solid;
   color:white;
@@ -60,7 +60,7 @@
 
 .model-select {
   padding: 6px 10px;
-  border-radius: 8px;
+  border-radius: 13px;
   border: 1px solid #666;
   background: #222;
   color: white;
@@ -76,7 +76,7 @@
 }
 
 .input_card {
-  border-radius: 20px;
+  border-radius: 13px;
   border-color:white;
   border-style:solid;
   margin-top: 1rem;
