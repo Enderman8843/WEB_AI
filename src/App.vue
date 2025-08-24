@@ -34,16 +34,67 @@ const modelList = ref([])
 const route = useRoute()
 const router = useRouter()
 
-function onModelChange(model) {
-  router.push({
-    query: {
-      ...route.query,
-      model
-    }
-  })
+
+
+
+const historyList = ref([])
+const currentChatId = ref(null)
+
+
+function saveChatHistory() {
+  if (!messages.value.length) return
+
+  const id = currentChatId.value || Date.now().toString()
+  const title =
+    messages.value.find(m => m.person === 'User')?.personi?.slice(0, 30) ||
+    "New Chat"
+
+  const date = new Date().toLocaleString() // add date string
+
+  const chat = {
+    id,
+    title,
+    date,
+    messages: JSON.parse(JSON.stringify(messages.value))
+  }
+
+  const idx = historyList.value.findIndex(c => c.id === id)
+  if (idx !== -1) {
+    historyList.value[idx] = chat
+  } else {
+    historyList.value.push(chat)
+  }
+
+  localStorage.setItem("chatHistory", JSON.stringify(historyList.value))
+  currentChatId.value = id
 }
 
 
+
+function loadHistory() {
+  const saved = localStorage.getItem("chatHistory")
+  if (saved) {
+    historyList.value = JSON.parse(saved)
+  }
+}
+
+
+function openHistoryChat(id) {
+  const chat = historyList.value.find(c => c.id === id)
+  if (chat) {
+    messages.value = JSON.parse(JSON.stringify(chat.messages))
+    currentChatId.value = chat.id
+  }
+}
+
+function deleteHistoryChat(id) {
+  historyList.value = historyList.value.filter(c => c.id !== id)
+  localStorage.setItem("chatHistory", JSON.stringify(historyList.value))
+  if (currentChatId.value === id) {
+    messages.value = []
+    currentChatId.value = null
+  }
+}
 
 function formatModelName(model) {
 
@@ -64,6 +115,7 @@ function formatModelName(model) {
 
 
 onMounted(async () => {
+  loadHistory()
 
   const parms = new URLSearchParams(window.location.searc)
   if (parms.get('model')){
@@ -139,7 +191,23 @@ function shareChat(){
     })
 }
 
+const newChat = () => {
+  messages.value = []
+  currentChatId.value = null
+  const id = Date.now().toString()
+  historyList.value.push({
+    id,
+    title: "New Chat",
+    date: new Date().toLocaleString(),
+    messages: []
+  })
+  currentChatId.value = id
+  localStorage.setItem("chatHistory", JSON.stringify(historyList.value))
+}
+
+
 async function sendmsg () {
+  
   const text = input.value.trim()
   if (!text || !engine || isStreaming.value) return
 
@@ -179,6 +247,8 @@ async function sendmsg () {
     isStreaming.value = false
     currentStream = null
   }
+  saveChatHistory()
+
 }
 </script>
 
@@ -198,8 +268,9 @@ async function sendmsg () {
   </header>
 
   <div class="main" >
-   
+    
     <div class="his_card" style="overflow-y: scroll; scrollbar-width: none; width: fit-content; margin-right: 10px;">
+      <button  @click="newChat" style="width:100%">Add new Chat</button>
          <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;" class=""> 
           <a>Select Model</a> 
           <select
@@ -211,11 +282,12 @@ async function sendmsg () {
     <option v-for="m in modelList" :key="m" :value="m">{{ formatModelName(m) }}</option>
   </select></div>
          <div style="background-color:white; height:1px"></div>
-      <history_element Heading="Random" Subject="Random Chat" />
-          <history_element Heading="Random" Subject="Random Chat" />
-          <history_element Heading="Random" Subject="Random Chat" />
-          <history_element Heading="Random" Subject="Random Chat" />
-          <history_element Heading="Random" Subject="Random Chat" />
+         <div v-for="chat in historyList" :key="chat.id" style="display:flex; align-items:center; justify-content:space-between; padding:0.5rem; cursor:pointer;">
+  <div @click="openHistoryChat(chat.id)">
+    <history_element :Heading="chat.title" Subject="Saved Chat" :chatId="chat.id" @delete="deleteHistoryChat"  />
+  </div>
+  
+</div>
     </div>
 
   
