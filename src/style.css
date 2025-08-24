@@ -58,6 +58,8 @@
  
 }
 
+
+
 .model-select {
   padding: 6px 10px;
   border-radius: 13px;
@@ -75,6 +77,34 @@
   color: white;
 }
 
+.main{
+   display: flex; 
+   flex-direction: row;
+}
+
+.card-m{
+  border-radius: 13px;
+  margin-top: 12px;
+  border-color:white;
+  border-style:solid;
+  color:white;
+  padding:1rem;
+  width: 70vw; 
+  height: 70vh; 
+  scrollbar-width: none; 
+  overflow-y: scroll; 
+  padding: 1rem;
+}
+
+
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column; 
+  }
+  .card-m{
+    width:fit-content
+  }
+}
 .input_card {
   border-radius: 13px;
   border-color:white;

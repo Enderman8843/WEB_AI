@@ -190,18 +190,16 @@ async function sendmsg () {
    
     <div style="width:95%; display:flex; justify-content:flex-end;">
       <span style="margin:0.2rem" v-if="loading"> Loading {{ progress }}%</span>
-  <button @click="shareChat" 
-          style="border:none; background-color:#242424; color:white; padding:0.2rem; border-radius:8px; cursor:pointer;">
-    <span class="material-icons">ios_share</span>
-  </button>
+ 
+    <span @click="shareChat" class="material-icons">ios_share</span>
+  
 </div>
 
   </header>
 
-  <div style="display: flex; flex-direction: row;">
+  <div class="main" >
    
-    <div class="his_card"
-         style="overflow: scroll; scrollbar-width: none; width: 25vw; margin-right: 10px; height: 86vh;">
+    <div class="his_card" style="overflow-y: scroll; scrollbar-width: none; width: fit-content; margin-right: 10px;">
          <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;" class=""> 
           <a>Select Model</a> 
           <select
@@ -214,12 +212,16 @@ async function sendmsg () {
   </select></div>
          <div style="background-color:white; height:1px"></div>
       <history_element Heading="Random" Subject="Random Chat" />
+          <history_element Heading="Random" Subject="Random Chat" />
+          <history_element Heading="Random" Subject="Random Chat" />
+          <history_element Heading="Random" Subject="Random Chat" />
+          <history_element Heading="Random" Subject="Random Chat" />
     </div>
 
   
     <div style="display: flex; flex-direction: column; flex: 1;">
       <div class="card"
-           style="width: 75vw; height: 70vh; scrollbar-width: none; overflow-y: scroll; padding: 1rem;">
+           style="width: auto; height: 70vh; scrollbar-width: none; overflow-y: scroll; padding: 1rem;">
         <chat_element
           v-for="(msg, index) in messages"
           :key="index"
