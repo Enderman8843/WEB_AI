@@ -269,10 +269,11 @@ async function sendmsg () {
 
   <div class="main" >
     
-    <div class="his_card" style="overflow-y: scroll; scrollbar-width: none; width: fit-content; margin-right: 10px;">
-      <button  @click="newChat" style="width:100%">Add new Chat</button>
+    <div class="his_card" style="overflow-x: scroll; scrollbar-width: none; width: fit-content; margin-right: 10px;">
+      <button class="model-select" @click="newChat" style="margin:10px; width:22vw ;  padding:0.5rem;">Add new Chat</button>
          <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;" class=""> 
-          <a>Select Model</a> 
+          <a>Select Model : </a> 
+          <div style="height:10px"></div>
           <select
           class="model-select"
            v-model="selectedModel" 

@@ -10,7 +10,7 @@ const emit = defineEmits(['delete'])
 </script>
 
 <template>
-  <div class="card" style="display:flex; flex-direction: row; margin:0px; width:300px; height:10%; padding:1rem; ">
+  <div class="card" style="display:flex; flex-direction: row; align-items:center; justify-content: space-between; margin:0; width:300px; padding:1rem;">
     <div style="width:25vw; display:flex; flex-direction: column;">
       <h2 style="margin:0px">{{ Heading }}</h2>
       <a>{{ Subject }}</a>
