@@ -39,7 +39,36 @@ const router = useRouter()
 
 const historyList = ref([])
 const currentChatId = ref(null)
+const showSystemPopup = ref(false)
+const systemInfo = ref({})
 
+function toggleSystemInfo() {
+  if (showSystemPopup.value) {
+    showSystemPopup.value = false
+    return
+  }
+
+  const mem = navigator.deviceMemory || "N/A"
+  const cpu = navigator.hardwareConcurrency || "N/A"
+  const webgpu = !!navigator.gpu
+
+  const heapUsed = performance.memory
+    ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + " MB"
+    : "N/A"
+  const heapLimit = performance.memory
+    ? (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2) + " MB"
+    : "N/A"
+
+  systemInfo.value = {
+    ram: mem + " GB",
+    cpu,
+    heapUsed,
+    heapLimit,
+    webgpu: webgpu ? "Supported" : " Not Supported"
+  }
+
+  showSystemPopup.value = true
+}
 
 function saveChatHistory() {
   if (!messages.value.length) return
@@ -116,7 +145,7 @@ function formatModelName(model) {
 
 onMounted(async () => {
   loadHistory()
-
+   
   const parms = new URLSearchParams(window.location.searc)
   if (parms.get('model')){
     this.selectedModel = params.get('model');
@@ -141,7 +170,10 @@ onMounted(async () => {
   }
 
 
-
+  if (!localStorage.getItem("visited")) {
+    showSystemPopup.value = true
+    localStorage.setItem("visited", "true")
+  }
 
 
 
@@ -262,10 +294,31 @@ async function sendmsg () {
       <span style="margin:0.2rem" v-if="loading"> Loading {{ progress }}%</span>
  
     <span @click="shareChat" class="material-icons">ios_share</span>
-  
+    <span @click="toggleSystemInfo" class="material-icons" style="cursor:pointer; margin:0.2rem;">
+      memory
+    </span>
 </div>
 
   </header>
+
+  <div v-if="showSystemPopup" class="overlay">
+  <div class="card" style="width:30vw; background-color: #242424;">
+    <h4 style="margin:8px 0;">System Info</h4>
+    <div style="margin:2px;">RAM: {{ systemInfo.ram }}</div>
+    <div style="margin:2px;">CPU Cores: {{ systemInfo.cpu }}</div>
+    <div style="margin:2px;">Heap Used: {{ systemInfo.heapUsed }}</div>
+    <div style="margin:2px;">Heap Limit: {{ systemInfo.heapLimit }}</div>
+    <div style="margin:2px;">WebGPU: {{ systemInfo.webgpu }}</div>
+    <h2 style="color:red"> WARNING DONT RUN HEAVY MODEL ! PC MAY CRASH </h2>
+    <button 
+      @click="showSystemPopup=false" 
+      style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">
+      Close
+    </button>
+  </div>
+</div>
+
+
 
   <div class="main" >
     
