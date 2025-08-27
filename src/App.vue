@@ -78,7 +78,7 @@ function saveChatHistory() {
     messages.value.find(m => m.person === 'User')?.personi?.slice(0, 30) ||
     "New Chat"
 
-  const date = new Date().toLocaleString() // add date string
+  const date = new Date().toLocaleString()
 
   const chat = {
     id,
@@ -288,7 +288,7 @@ async function sendmsg () {
   <header
     style="display:flex; flex-direction: row; border-radius: 13px; border-width: 2px; border-color: white; border-style: solid; color: white; padding:0.5rem;"
   >
-    <a style="margin:0.2rem">WEB - AI</a>
+    <a style="font-family:Noto Sans, sans-serif; font-weight:600; font-size: larger; margin:0.2rem">Lanthanum.AI</a>
    
     <div style="width:95%; display:flex; justify-content:flex-end;">
       <span style="margin:0.2rem" v-if="loading"> Loading {{ progress }}%</span>
@@ -308,9 +308,11 @@ async function sendmsg () {
     <div style="margin:2px;">CPU Cores: {{ systemInfo.cpu }}</div>
     <div style="margin:2px;">Heap Used: {{ systemInfo.heapUsed }}</div>
     <div style="margin:2px;">Heap Limit: {{ systemInfo.heapLimit }}</div>
-    <div style="margin:2px;">WebGPU: {{ systemInfo.webgpu }}</div>
+    <div  :style="systemInfo.webgpu === 'Not supported' ? { color: 'red',fontWeight: 'bold'} : {}"
+>WebGPU: {{ systemInfo.webgpu }}</div>
     <h2 style="color:red"> WARNING DONT RUN HEAVY MODEL ! PC MAY CRASH </h2>
-    <button 
+    <button
+      
       @click="showSystemPopup=false" 
       style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">
       Close
