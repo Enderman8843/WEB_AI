@@ -1,5 +1,5 @@
-# WEB AI
- It is a simple app that uses js to load small LLM's in the users pc via WEB-GPU and generate responses 
+# Lanthanum.AI (Web_AI)
+ Lanthanum.AI is a project with which the user can access small LLM models through web which would be running via WEB GPU and this doesn't require any kind of AI , Everything runs in local and nothing goes out of users pc.
 
  # Installation
 
