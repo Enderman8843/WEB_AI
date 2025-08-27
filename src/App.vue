@@ -43,32 +43,9 @@ const showSystemPopup = ref(false)
 const systemInfo = ref({})
 
 function toggleSystemInfo() {
-  if (showSystemPopup.value) {
-    showSystemPopup.value = false
-    return
-  }
-
-  const mem = navigator.deviceMemory || "N/A"
-  const cpu = navigator.hardwareConcurrency || "N/A"
-  const webgpu = !!navigator.gpu
-
-  const heapUsed = performance.memory
-    ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + " MB"
-    : "N/A"
-  const heapLimit = performance.memory
-    ? (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2) + " MB"
-    : "N/A"
-
-  systemInfo.value = {
-    ram: mem + " GB",
-    cpu,
-    heapUsed,
-    heapLimit,
-    webgpu: webgpu ? "Supported" : " Not Supported"
-  }
-
-  showSystemPopup.value = true
+  showSystemPopup.value = !showSystemPopup.value;
 }
+
 
 function saveChatHistory() {
   if (!messages.value.length) return
@@ -144,6 +121,31 @@ function formatModelName(model) {
 
 
 onMounted(async () => {
+
+  const mem = navigator.deviceMemory || "N/A"
+  const cpu = navigator.hardwareConcurrency || "N/A"
+  const webgpu = !!navigator.gpu
+
+  const heapUsed = performance.memory
+    ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + " MB"
+    : "N/A"
+  const heapLimit = performance.memory
+    ? (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2) + " MB"
+    : "N/A"
+
+  systemInfo.value = {
+    ram: mem + " GB",
+    cpu,
+    heapUsed,
+    heapLimit,
+    webgpu: webgpu ? "Supported" : " Not Supported"
+  }
+
+  if (!webgpu || !localStorage.getItem("visited")) {
+    showSystemPopup.value = true;
+    localStorage.setItem("visited", "true");
+  }
+
   loadHistory()
    
   const parms = new URLSearchParams(window.location.searc)
@@ -313,7 +315,7 @@ async function sendmsg () {
     <h2>Wait for 60-120 sec to load the model</h2>
       <h2 style="color:red"> WARNING DONT RUN HEAVY MODEL ! PC MAY CRASH </h2>
     <button
-      
+      v-if="systemInfo.webgpu === 'Supported'"
       @click="showSystemPopup=false" 
       style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">
       Close
