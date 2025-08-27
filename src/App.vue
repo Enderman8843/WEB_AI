@@ -324,7 +324,7 @@ async function sendmsg () {
     <div class="card" style="width:30vw; background-color:#242424; text-align:center; padding:1rem;">
       <h3 style="color:white; margin-bottom:1rem;">Loading Model...</h3>
 
-      <!-- Progress Bar -->
+      
       <div style="width:100%; height:20px; border:2px solid white; border-radius:10px; overflow:hidden;">
         <div 
           :style="{
@@ -337,7 +337,7 @@ async function sendmsg () {
       </div>
 
       <p style="color:white; margin-top:0.5rem;">{{ progress }}%</p>
-      <p style="color:gray; font-size:0.9rem;">This may take up to 1–2 minutes</p>
+      <p style="color:gray; font-size:0.9rem;">This may take up to 1–2 minute, Depends upon your net </p>
     </div>
   </div>
 
