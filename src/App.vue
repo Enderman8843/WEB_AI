@@ -3,7 +3,7 @@ import history_element from './components/history_element.vue'
 import chat_element from './components/chat_element.vue'
 import 'material-icons/iconfont/material-icons.css'
 import { CreateMLCEngine,  prebuiltAppConfig } from '@mlc-ai/web-llm'
-import { Analytics } from "@vercel/analytics/next"
+import { inject } from "@vercel/analytics"
 import { ref, onMounted } from 'vue'
 
 import { useRoute, useRouter } from 'vue-router'
