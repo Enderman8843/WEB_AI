@@ -3,7 +3,7 @@ import history_element from './components/history_element.vue'
 import chat_element from './components/chat_element.vue'
 import 'material-icons/iconfont/material-icons.css'
 import { CreateMLCEngine,  prebuiltAppConfig } from '@mlc-ai/web-llm'
-
+import { Analytics } from "@vercel/analytics/next"
 import { ref, onMounted } from 'vue'
 
 import { useRoute, useRouter } from 'vue-router'
@@ -337,7 +337,7 @@ async function sendmsg () {
       </div>
 
       <p style="color:white; margin-top:0.5rem;">{{ progress }}%</p>
-      <p style="color:gray; font-size:0.9rem;">This may take up to 1–2 minute, Depends upon your net </p>
+      <p style="color:gray; font-size:0.9rem;">This may take up to 4-5 min, depends upon you net </p>
     </div>
   </div>
 
