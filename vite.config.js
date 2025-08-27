@@ -3,12 +3,12 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue() ],
+  plugins: [vue()],
   server: {
-    host: true,  // makes Vite listen on all network interfaces
+    host: true,
     allowedHosts: [
-      '.ngrok-free.app'  // allow any ngrok subdomain
+    
+      'lanthanum.ai.endinvoid.hackclub.app' 
     ]
   }
 })
-  
