@@ -291,7 +291,7 @@ async function sendmsg () {
     <a style="font-family:Noto Sans, sans-serif; font-weight:600; font-size: larger; margin:0.2rem">Lanthanum.AI</a>
    
     <div style="width:95%; display:flex; justify-content:flex-end;">
-      <span style="margin:0.2rem" v-if="loading"> Loading {{ progress }}%</span>
+   
  
     <span @click="shareChat" class="material-icons">ios_share</span>
     <span @click="toggleSystemInfo" class="material-icons" style="cursor:pointer; margin:0.2rem;">
@@ -310,7 +310,8 @@ async function sendmsg () {
     <div style="margin:2px;">Heap Limit: {{ systemInfo.heapLimit }}</div>
     <div  :style="systemInfo.webgpu === 'Not supported' ? { color: 'red',fontWeight: 'bold'} : {}"
 >WebGPU: {{ systemInfo.webgpu }}</div>
-    <h2 style="color:red"> WARNING DONT RUN HEAVY MODEL ! PC MAY CRASH </h2>
+    <h2>Wait for 60-120 sec to load the model</h2>
+      <h2 style="color:red"> WARNING DONT RUN HEAVY MODEL ! PC MAY CRASH </h2>
     <button
       
       @click="showSystemPopup=false" 
@@ -319,7 +320,26 @@ async function sendmsg () {
     </button>
   </div>
 </div>
+<div v-if="loading" class="overlay">
+    <div class="card" style="width:30vw; background-color:#242424; text-align:center; padding:1rem;">
+      <h3 style="color:white; margin-bottom:1rem;">Loading Model...</h3>
 
+      <!-- Progress Bar -->
+      <div style="width:100%; height:20px; border:2px solid white; border-radius:10px; overflow:hidden;">
+        <div 
+          :style="{
+            width: progress + '%',
+            height: '100%',
+            backgroundColor: 'white',
+            transition: 'width 0.3s ease'
+          }">
+        </div>
+      </div>
+
+      <p style="color:white; margin-top:0.5rem;">{{ progress }}%</p>
+      <p style="color:gray; font-size:0.9rem;">This may take up to 1–2 minutes</p>
+    </div>
+  </div>
 
 
   <div class="main" >
