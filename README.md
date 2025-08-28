@@ -16,5 +16,11 @@ npm run dev
  # Demo 
   https://lanthanum.vercel.app/?model=SmolLM2-360M-Instruct-q0f32-MLC
 
-# 
+# Compabality Issues
+Lanthanum.AI is best recommened to run on Chromium based browser i.e Chrome and Edge  >= 113 , If using other broswers check this guide 
+https://caniuse.com/webgpu 
+
+
+
+
  
