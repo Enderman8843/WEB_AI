@@ -3,7 +3,7 @@ import history_element from './components/history_element.vue'
 import chat_element from './components/chat_element.vue'
 import 'material-icons/iconfont/material-icons.css'
 import { CreateMLCEngine,  prebuiltAppConfig } from '@mlc-ai/web-llm'
-import { inject } from "@vercel/analytics"
+
 import { ref, onMounted } from 'vue'
 
 import { useRoute, useRouter } from 'vue-router'
@@ -26,6 +26,7 @@ const selectedModel = ref('')
 const progress = ref(0)
 const isStreaming = ref(false)
 
+const error = ref(null)  
 
 let engine = null
 let currentStream = null  
@@ -43,9 +44,32 @@ const showSystemPopup = ref(false)
 const systemInfo = ref({})
 
 function toggleSystemInfo() {
-  showSystemPopup.value = !showSystemPopup.value;
-}
+  if (showSystemPopup.value) {
+    showSystemPopup.value = false
+    return
+  }
 
+  const mem = navigator.deviceMemory || "N/A"
+  const cpu = navigator.hardwareConcurrency || "N/A"
+  const webgpu = !!navigator.gpu
+
+  const heapUsed = performance.memory
+    ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + " MB"
+    : "N/A"
+  const heapLimit = performance.memory
+    ? (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2) + " MB"
+    : "N/A"
+
+  systemInfo.value = {
+    ram: mem + " GB",
+    cpu,
+    heapUsed,
+    heapLimit,
+    webgpu: webgpu ? "Supported" : " Not Supported"
+  }
+
+  showSystemPopup.value = true
+}
 
 function saveChatHistory() {
   if (!messages.value.length) return
@@ -105,8 +129,6 @@ function deleteHistoryChat(id) {
 function formatModelName(model) {
 
   const parts = model.split('-')
-
-
   const quantPart = parts.find(p => p.startsWith('q')) || ''
 
  
@@ -114,41 +136,15 @@ function formatModelName(model) {
   if (parts[1] && /\d/.test(parts[1])) {
     baseName += '-' + parts[1]
   }
-
   return `${baseName}   |   ${quantPart}`
 }
 
 
 
 onMounted(async () => {
-
-  const mem = navigator.deviceMemory || "N/A"
-  const cpu = navigator.hardwareConcurrency || "N/A"
-  const webgpu = !!navigator.gpu
-
-  const heapUsed = performance.memory
-    ? (performance.memory.usedJSHeapSize / 1048576).toFixed(2) + " MB"
-    : "N/A"
-  const heapLimit = performance.memory
-    ? (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2) + " MB"
-    : "N/A"
-
-  systemInfo.value = {
-    ram: mem + " GB",
-    cpu,
-    heapUsed,
-    heapLimit,
-    webgpu: webgpu ? "Supported" : " Not Supported"
-  }
-
-  if (!webgpu || !localStorage.getItem("visited")) {
-    showSystemPopup.value = true;
-    localStorage.setItem("visited", "true");
-  }
-
   loadHistory()
    
-  const parms = new URLSearchParams(window.location.searc)
+  const parms = new URLSearchParams(window.location)
   if (parms.get('model')){
     this.selectedModel = params.get('model');
   }
@@ -173,7 +169,7 @@ onMounted(async () => {
 
 
   if (!localStorage.getItem("visited")) {
-    showSystemPopup.value = true
+
     localStorage.setItem("visited", "true")
   }
 
@@ -189,13 +185,15 @@ onMounted(async () => {
     progress.value = Math.round(val <= 1 ? val * 100 : val)
   }
 
+  
   try {
-    engine = await CreateMLCEngine(selectedModel.value, { initProgressCallback })
-  } catch (err) {
-    console.error('Engine init failed:', err)
-  } finally {
-    loading.value = false
-  }
+  engine = await CreateMLCEngine(selectedModel.value, { initProgressCallback })
+} catch (err) {
+  console.error("Engine init failed:", err)
+  error.value = (err?.stack || err?.message || String(err))
+} finally {
+  loading.value = false
+}
 })
 
 
@@ -312,22 +310,22 @@ async function sendmsg () {
     <div style="margin:2px;">Heap Limit: {{ systemInfo.heapLimit }}</div>
     <div  :style="systemInfo.webgpu === 'Not supported' ? { color: 'red',fontWeight: 'bold'} : {}"
 >WebGPU: {{ systemInfo.webgpu }}</div>
-    <h2>Wait for 60-120 sec to load the model</h2>
-      <h2 style="color:red"> WARNING DONT RUN HEAVY MODEL ! PC MAY CRASH </h2>
+    
     <button
-      v-if="systemInfo.webgpu === 'Supported'"
+      
       @click="showSystemPopup=false" 
       style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">
       Close
     </button>
   </div>
 </div>
-<div v-if="loading" class="overlay">
-    <div class="card" style="width:30vw; background-color:#242424; text-align:center; padding:1rem;">
-      <h3 style="color:white; margin-bottom:1rem;">Loading Model...</h3>
+<div v-if="loading || error" class="overlay">
+  <div class="card" style="width:30vw; background-color:#242424; text-align:center; padding:1rem;">
+    <template v-if="loading && !error">
+      <h3 style="color:white;">Loading Model...</h3>
 
       
-      <div style="width:100%; height:20px; border:2px solid white; border-radius:10px; overflow:hidden;">
+      <div style="width:100%; height:20px; border:2px solid white; border-radius:10px; overflow:hidden; margin:1rem 0;">
         <div 
           :style="{
             width: progress + '%',
@@ -338,10 +336,32 @@ async function sendmsg () {
         </div>
       </div>
 
-      <p style="color:white; margin-top:0.5rem;">{{ progress }}%</p>
-      <p style="color:gray; font-size:0.9rem;">This may take up to 4-5 min, depends upon you net </p>
+      <p style="color:white;">{{ progress }}%</p>
+      <p style="color:gray; font-size:0.9rem;">This may take up to 1–2 minutes</p>
+    </template>
+
+    <template v-else-if="error">
+    <div>
+      <div style="background-color:  #6b6767;; ; padding:1rem; border-radius:10px;
+                max-height:150px; overflow-y:auto; font-size:0.9rem;">
+                
+    <p style="font-family: consolas;">Error Occured: {{ error }}</p>
     </div>
+    <p style="font-size:small; font-family: consolas;">Note : This program has been tested in various machine and has no error , If you are facing error it must be due to hardware limitation prefer the cpu option</p>
+      <button 
+        @click="() => window.location.reload()"
+        style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">
+        Use CPU
+      </button>
+        </div>
+    </template>
+
+  
+
   </div>
+</div>
+
+
 
 
   <div class="main" >
