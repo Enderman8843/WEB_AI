@@ -1,13 +1,16 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
+import Cpu from './pages/cpu.vue'
+import GPU from './pages/gpu.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
     history: createWebHistory(),
-    routes: []         
+    routes: [{ path: '/', name: 'Home', component: GPU },
+      { path: '/cpu', name: 'Cpu', component: Cpu }]         
   })
-  
+ 
   const app = createApp(App)
   app.use(router)
   
