@@ -25,19 +25,13 @@ const loading  = ref(true)
 const selectedModel = ref('')
 const progress = ref(0)
 const isStreaming = ref(false)
-
 const error = ref(null)  
-
 let engine = null
 let currentStream = null  
 let stopRequested = false  
 const modelList = ref([])  
 const route = useRoute()
 const router = useRouter()
-
-
-
-
 const historyList = ref([])
 const currentChatId = ref(null)
 const showSystemPopup = ref(false)
@@ -302,6 +296,7 @@ async function sendmsg () {
   </header>
 
   <div v-if="showSystemPopup" class="overlay">
+  <div style="margin:10px">
   <div class="card" style="width:30vw; background-color: #242424;">
     <h4 style="margin:8px 0;">System Info</h4>
     <div style="margin:2px;">RAM: {{ systemInfo.ram }}</div>
@@ -318,6 +313,7 @@ async function sendmsg () {
       Close
     </button>
   </div>
+</div>
 </div>
 <div v-if="loading || error" class="overlay">
   <div class="card" style="width:30vw; background-color:#242424; text-align:center; padding:1rem;">
