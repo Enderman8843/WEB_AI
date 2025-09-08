@@ -284,11 +284,11 @@ async function sendmsg () {
   >
     <a style="font-family:Noto Sans, sans-serif; font-weight:600; font-size: larger; margin:0.2rem">Lanthanum.AI</a>
    
-    <div style="width:95%; display:flex; justify-content:flex-end;">
+    <div style="width:95%; display:flex; justify-content:flex-end; gap:0.5rem;">
    
  
-    <span @click="shareChat" class="material-icons">ios_share</span>
-    <span @click="toggleSystemInfo" class="material-icons" style="cursor:pointer; margin:0.2rem;">
+    <span @click="shareChat" class="material-icons" style="cursor:pointer">ios_share</span>
+    <span @click="toggleSystemInfo" class="material-icons" style="cursor:pointer;">
       memory
     </span>
 </div>

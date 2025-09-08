@@ -29,8 +29,6 @@ const modelList =  ref([
   'HuggingFaceTB/SmolLM2-360M-Instruct',
  
   'onnx-community/Llama-3.2-1B-Instruct',
- 
- 
   'HuggingFaceTB/SmolLM3-3B'
 ])
 

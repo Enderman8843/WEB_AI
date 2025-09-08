@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     host: true,
+    historyApiFallback: true,
     allowedHosts: [
     
       'lanthanum.ai.endinvoid.hackclub.app' 
