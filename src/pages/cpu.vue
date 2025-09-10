@@ -140,7 +140,7 @@ watch(selectedModel, (newModel) => {
   >
     <a style="font-family:Noto Sans, sans-serif; font-weight:600; font-size: larger; margin:0.2rem">Lanthanum.AI</a>
    
-    <div style="width:95%; display:flex; justify-content:flex-end;">
+    <div style="width:95%; display:flex; justify-content:flex-end; gap:0.5rem;">
    
  
       <router-link to="/"><button class="btn-ic" ><span class="material-icons">memory</span>Use GPU</button></router-link>
