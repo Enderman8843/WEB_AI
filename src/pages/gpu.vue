@@ -380,7 +380,7 @@ async function sendmsg () {
   
     <div style="display: flex; flex-direction: column; flex: 1;">
       <div class="card"
-           style="width: auto; height: 70vh; scrollbar-width: none; overflow-y: scroll; padding: 1rem;">
+           style="width: auto; height: 100%; scrollbar-width: none; overflow-y: scroll; padding: 1rem;">
         <chat_element
           v-for="(msg, index) in messages"
           :key="index"
