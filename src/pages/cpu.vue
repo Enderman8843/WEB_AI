@@ -90,24 +90,26 @@ onMounted(() => {
   worker = new Worker(new URL('../worker.js', import.meta.url), { type: 'module' })
 
   worker.onmessage = (e) => {
-    const msg = e.data
-    if (msg.type === 'progress') progress.value = msg.progress
-    if (msg.type === 'token') {
-      messages.value[messages.value.length - 1].personi = msg.full
-    
-    }
-    if (msg.type === 'done') {
-      isStreaming.value = false
-      saveChatHistory()
-    }
-    if (msg.type === 'error') {
-      isStreaming.value = false
-      messages.value[messages.value.length - 1].personi = `(error: ${msg.message})`
-    }
-    if (msg.type === 'ready') {
-      loading.value = false
-    }
+  const msg = e.data
+  if (msg.type === 'progress') {
+    progress.value = msg.progress
   }
+  if (msg.type === 'token') {
+    messages.value[messages.value.length - 1].personi = msg.full
+  }
+  if (msg.type === 'done') {
+    isStreaming.value = false
+    saveChatHistory()
+  }
+  if (msg.type === 'error') {
+    isStreaming.value = false
+    error.value = msg.message   
+  }
+  if (msg.type === 'ready') {
+    loading.value = false
+  }
+}
+
 
 
   worker.postMessage({ type: 'init', data: { model: selectedModel.value } })
@@ -141,10 +143,9 @@ watch(selectedModel, (newModel) => {
     <div style="width:95%; display:flex; justify-content:flex-end;">
    
  
-    <span @click="shareChat" class="material-icons">ios_share</span>
-    <span @click="toggleSystemInfo" class="material-icons" style="cursor:pointer; margin:0.2rem;">
-      memory
-    </span>
+      <router-link to="/"><button class="btn-ic" ><span class="material-icons">memory</span>Use GPU</button></router-link>
+   <button @click="shareChat" class="btn-ic"><span  class="material-icons">ios_share</span>Share Chat</button> 
+   <button @click="toggleSystemInfo" class="btn-ic"><span  class="material-icons">computer</span>Stats</button>
 </div>
 
   </header>
@@ -173,11 +174,11 @@ watch(selectedModel, (newModel) => {
     </div>
     
     <p style="font-size:small; font-family: consolas;">Note : This program has been tested in various machine and has no error , If you are facing error it must be due to hardware limitation prefer the cpu option</p>
-    <router-link to="/cpu">
+    <router-link to="/">
     <button 
        
         style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">
-        Use CPU
+        Use GPU
       </button>
       </router-link>
         </div>

@@ -5,7 +5,8 @@
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-  
+
+
 
 }
 .spin {
@@ -17,6 +18,24 @@
   to   { transform: rotate(360deg); }
 }
 
+.btn-ic {
+  display: inline-flex; 
+  gap:1rem;
+  align-items: center;         
+  border-radius: 13px;
+  border-color: white;
+  border-style: solid;
+  background-color: unset;
+  padding: 0.5rem;         
+  cursor: pointer;
+  color: white;   
+  font-size: 0.8rem;      
+}
+
+.btn-ic .material-icons {
+  font-size: 1.3rem;           
+  vertical-align: middle;
+}
 
 .close {
   position: absolute;

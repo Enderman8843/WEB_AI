@@ -286,11 +286,10 @@ async function sendmsg () {
    
     <div style="width:95%; display:flex; justify-content:flex-end; gap:0.5rem;">
    
- 
-    <span @click="shareChat" class="material-icons" style="cursor:pointer">ios_share</span>
-    <span @click="toggleSystemInfo" class="material-icons" style="cursor:pointer;">
-      memory
-    </span>
+
+   <router-link to="/cpu"><button class="btn-ic" ><span class="material-icons">memory</span>Use CPU</button></router-link>
+   <button @click="shareChat" class="btn-ic"><span  class="material-icons">ios_share</span>Share Chat</button> 
+   <button @click="toggleSystemInfo" class="btn-ic"><span  class="material-icons">computer</span>Stats</button>
 </div>
 
   </header>
