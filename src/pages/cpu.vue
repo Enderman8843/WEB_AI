@@ -208,7 +208,7 @@ watch(selectedModel, (newModel) => {
     <option v-for="m in modelList" :key="m" :value="m">{{m}}</option>
   </select></div>
          <div style="background-color:white; height:1px"></div>
-         <div v-for="chat in historyList" :key="chat.id" style="display:flex; align-items:center; justify-content:space-between; padding:0.5rem; cursor:pointer;">
+         <div v-for="chat in historyList" :key="chat.id" style="width:100%;display:flex; align-items:center; justify-content:space-between; padding:0.5rem; cursor:pointer;">
   <div @click="openHistoryChat(chat.id)">
     <history_element :Heading="chat.title" Subject="Saved Chat" :chatId="chat.id" @delete="deleteHistoryChat"  />
   </div>

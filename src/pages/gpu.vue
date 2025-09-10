@@ -355,9 +355,9 @@ async function sendmsg () {
 
   <div class="main" >
     
-    <div class="his_card" style="overflow-x: scroll; scrollbar-width: none; margin-right: 10px;">
+    <div class="his_card" style=" flex: 0 0 24%;;overflow-x: scroll; scrollbar-width: none; margin-right: 10px;">
       <button class="model-select" @click="newChat" style="margin:10px;  padding:0.5rem;">Add new Chat</button>
-         <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;" class=""> 
+         <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;"> 
           <a>Select Model : </a> 
           <div style="height:10px"></div>
           <select
@@ -369,7 +369,7 @@ async function sendmsg () {
     <option v-for="m in modelList" :key="m" :value="m">{{ formatModelName(m) }}</option>
   </select></div>
          <div style="background-color:white; height:1px"></div>
-         <div v-for="chat in historyList" :key="chat.id" style="display:flex; align-items:center; justify-content:space-between; padding:0.5rem; cursor:pointer;">
+         <div v-for="chat in historyList" :key="chat.id" style="display:flex; align-items:center; width:100%;justify-content:space-between; padding:0.5rem; cursor:pointer;">
   <div @click="openHistoryChat(chat.id)">
     <history_element :Heading="chat.title" Subject="Saved Chat" :chatId="chat.id" @delete="deleteHistoryChat"  />
   </div>
