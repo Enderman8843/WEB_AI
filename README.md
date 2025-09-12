@@ -15,17 +15,13 @@ npm run dev
 
  # Demo 
   https://lanthanum.vercel.app/?model=SmolLM2-360M-Instruct-q0f32-MLC
-  
+  https://github.com/user-attachments/assets/80d817e6-eac3-40f4-8a08-299b0f8377aa
 
 # Compabality Issues
 Lanthanum.AI is best recommened to run on Chromium based browser i.e Chrome and Edge  >= 113 , If using other broswers check this guide also this dosent work if your pc dosent support DirectX12
-
-
-https://github.com/user-attachments/assets/80d817e6-eac3-40f4-8a08-299b0f8377aa
-
-
-
 https://caniuse.com/webgpu 
+
+If you can't use webGPU models try clicking on USE CPU btn on error.
 
 
 
