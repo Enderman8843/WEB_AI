@@ -21,7 +21,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 const input    = ref('')
 const messages = ref([])
-const loading  = ref(true)
+const loading  = ref(false)
 const selectedModel = ref('')
 const progress = ref(0)
 const isStreaming = ref(false)
@@ -36,7 +36,7 @@ const historyList = ref([])
 const currentChatId = ref(null)
 const showSystemPopup = ref(false)
 const systemInfo = ref({})
-
+const selectedMode = ref('')
 function toggleSystemInfo() {
   if (showSystemPopup.value) {
     showSystemPopup.value = false
@@ -168,28 +168,41 @@ onMounted(async () => {
   }
 
 
+})
 
-  const initProgressCallback = (report) => {
-    const val =
-      typeof report === 'number'
+
+async function modei(mode_choice) {
+  selectedMode.value = mode_choice
+
+  if (mode_choice === 'cpu') {
+    router.push('/cpu')
+  } else if (mode_choice === 'vlm') {
+    router.push('/vlm')
+  } else if (mode_choice === 'gpu') {
+    
+    loading.value = true
+
+
+    const initProgressCallback = (report) => {
+      const val = typeof report === 'number'
         ? report
         : typeof report?.progress === 'number'
         ? report.progress
         : 0
-    progress.value = Math.round(val <= 1 ? val * 100 : val)
+      progress.value = Math.round(val <= 1 ? val * 100 : val)
+    }
+
+    try {
+      engine = await CreateMLCEngine(selectedModel.value, { initProgressCallback })
+      console.log('GPU engine loaded!')
+    } catch (err) {
+      console.error("Engine init failed:", err)
+      error.value = err?.stack || err?.message || String(err)
+    } finally {
+      loading.value = false
+    }
   }
-
-  
-  try {
-  engine = await CreateMLCEngine(selectedModel.value, { initProgressCallback })
-} catch (err) {
-  console.error("Engine init failed:", err)
-  error.value = (err?.stack || err?.message || String(err))
-} finally {
-  loading.value = false
 }
-})
-
 
 function newModel(model){
   if (model)
@@ -313,6 +326,31 @@ async function sendmsg () {
     </button>
   </div>
 </div>
+</div>
+<div v-if="!selectedMode">
+  <div class ="overlay">
+    <div class="card" style="justify-content: center; align-items: center; width:30vw; background-color:#242424; text-align:center; padding:1rem;">
+      <h3 style="color:white;">Select Mode!</h3>
+      <div style="display:flex; flex-direction: row; gap:10px; justify-content: center; align-items: center"> 
+      <div @click="modei('cpu')" class="card" style="justify-content: center; align-items: center; height:100px; width:100px; cursor:pointer; display: flex; flex-direction: column; gap:5px"  ><span style="font-size:20px">CPU</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-cpu" viewBox="0 0 16 16">
+  <path d="M5 0a.5.5 0 0 1 .5.5V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2A2.5 2.5 0 0 1 14 4.5h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14a2.5 2.5 0 0 1-2.5 2.5v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14A2.5 2.5 0 0 1 2 11.5H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2A2.5 2.5 0 0 1 4.5 2V.5A.5.5 0 0 1 5 0m-.5 3A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13h7a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 11.5 3zM5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5zM6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
+</svg>
+<span style="font-size:xx-small; font-family: consolas;">Uses CPU power to run AI model!</span></div>
+      <div @click="modei('gpu')" class="card" style="justify-content: center; align-items: center; height:100px; width:100px; cursor:pointer; display: flex; flex-direction: column; gap:5px"  ><span style="font-size:20px" >GPU</span><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-gpu-card" viewBox="0 0 16 16">
+  <path d="M4 8a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0m7.5-1.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/>
+  <path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .5.5V4h13.5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H2v2.5a.5.5 0 0 1-1 0V2H.5a.5.5 0 0 1-.5-.5m5.5 4a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M9 8a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0"/>
+  <path d="M3 12.5h3.5v1a.5.5 0 0 1-.5.5H3.5a.5.5 0 0 1-.5-.5zm4 1v-1h4v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5"/>
+</svg><span style="font-size:xx-small; font-family: consolas;">Uses your GPU power to run AI model!</span></div>
+<div @click="modei('vlm')" class="card" style="justify-content: center; align-items: center; height:100px; width:100px; cursor:pointer; display: flex; flex-direction: column; gap:0px"  ><span style="font-size:20px" >VLM</span><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-webcam" viewBox="0 0 16 16">
+  <path d="M0 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H9.269c.144.162.33.324.531.475a7 7 0 0 0 .907.57l.014.006.003.002A.5.5 0 0 1 10.5 13h-5a.5.5 0 0 1-.224-.947l.003-.002.014-.007a5 5 0 0 0 .268-.148 7 7 0 0 0 .639-.421c.2-.15.387-.313.531-.475H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/>
+  <path d="M8 6.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m7 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+</svg> <span style="font-size:xx-small; font-family: consolas;">A Live Vision Model Running in your broswer</span></div>
+    </div> 
+    <p style="font-size:small; font-family: consolas;">Note: USE GPU or VLM feature as they are stable , don't prefer cpu as it is slow and time taking , it is there only as a failsafe</p>
+    </div> 
+    
+  </div>
 </div>
 <div v-if="loading || error" class="overlay">
   <div class="card" style="width:30vw; background-color:#242424; text-align:center; padding:1rem;">

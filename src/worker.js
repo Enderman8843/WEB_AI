@@ -52,7 +52,10 @@ self.onmessage = async (e) => {
       try {
         await generator(text, {
           max_new_tokens: 256,
-          temperature: 0.8,
+          temperature: 0.4,
+          top_k: 50,
+          top_p: 0.9,
+          repetition_penalty: 1.2,
           streamer,
         });
         self.postMessage({ type: "done" });
