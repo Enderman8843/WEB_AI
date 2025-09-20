@@ -393,7 +393,7 @@ async function sendmsg () {
 
   <div class="main" >
     
-    <div class="his_card" style=" flex: 0 0 24%;;overflow-x: scroll; scrollbar-width: none; margin-right: 10px;">
+    <div class="his_card" style="overflow-x: scroll; scrollbar-width: none; margin-right: 10px;">
       <button class="model-select" @click="newChat" style="margin:10px;  padding:0.5rem;">Add new Chat</button>
          <div style="margin:10px; width:100%; height:10%;  padding:0.5rem;"> 
           <a>Select Model : </a> 

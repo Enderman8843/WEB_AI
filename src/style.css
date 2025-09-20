@@ -32,6 +32,25 @@
   font-size: 0.8rem;      
 }
 
+.btn-ice {
+  display: flex;            
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;  
+  border-radius: 13px;
+  border-color: white;
+  background-color: transparent;
+  cursor: pointer;
+  width: 100%;              
+  max-width: 320px;         
+  padding: 0.6rem;     
+  margin: 10px;           
+  color: white;
+  font-size: 1.2rem;
+  box-sizing: border-box;   
+}
+
+
 .btn-ic .material-icons {
   font-size: 1.3rem;           
   vertical-align: middle;
@@ -63,6 +82,17 @@
   color:white;
   height: 85vh
  
+}
+
+.his_cardi {
+  border-radius: 13px;
+  margin-top: 12px;
+  border-color:white;
+  width: 25%;
+  border-style:solid;
+  color:white;
+  height: 85vh;
+  overflow-y:none
 }
 
 .overlay {
