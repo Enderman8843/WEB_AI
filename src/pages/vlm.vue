@@ -44,12 +44,13 @@ watch(activeTab, (newTab, oldTab) => {
 
 onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search)
-  const mode = urlParams.get("mode") || "webgpu" 
-
+  const mode = urlParams.get("mode") || "webgpu"
 
   worker.value = new Worker(new URL('../worker_vlm.js', import.meta.url), { type: 'module' })
   worker.value.onmessage = handleWorkerMessage
-  worker.value.postMessage({ type: "init", mode }) 
+
+  modelLoading.value = true
+  worker.value.postMessage({ type: "init", mode })  
 
   worker.value.onmessage = (e) => {
     const { type, text, tokens, error: err } = e.data;
@@ -130,7 +131,6 @@ function handleWorkerMessage(e) {
   if (type === "ready") modelLoading.value = false
 
   if (type === "progress") {
-    // live caption
     output.value = text
     if (tokens !== undefined) progress.value = tokens
   }
@@ -160,7 +160,7 @@ function removeVideo() {
   }
 }
 
-// Webcam controls
+
 async function startWebcam() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true })
@@ -251,7 +251,7 @@ function stopCapturingFrames() {
           <p style="font-family:consolas;">Error Occurred: {{ error }}</p>
 
           <p style="font-size:small; font-family: consolas;">Note : This program has been tested in various machine and has no error , If you are facing error it must be due to hardware limitation prefer the cpu option</p>
-    <router-link to="/vlm?mode=cpu">
+    <router-link to="/vlm?mode=wasm">
     <button 
        
         style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">

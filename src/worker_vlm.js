@@ -11,9 +11,10 @@ let isModelLoaded = false;
 let modelMode = "webgpu";
 
 async function initializeModel(mode) {
+  console.log(mode)
   if (isModelLoaded) return;
 
-  modelMode = mode || "webgpu";
+  modelMode = mode 
 
   postMessage({ type: "progress", text: "Loading processor...", tokens: 20 });
   processor = await AutoProcessor.from_pretrained("onnx-community/FastVLM-0.5B-ONNX");
@@ -22,7 +23,8 @@ async function initializeModel(mode) {
   model = await AutoModelForImageTextToText.from_pretrained(
     "onnx-community/FastVLM-0.5B-ONNX",
     {
-      device: modelMode, 
+      device: mode, 
+  
     }
   );
 
