@@ -43,7 +43,13 @@ watch(activeTab, (newTab, oldTab) => {
 })
 
 onMounted(() => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const mode = urlParams.get("mode") || "webgpu" 
+
+
   worker.value = new Worker(new URL('../worker_vlm.js', import.meta.url), { type: 'module' })
+  worker.value.onmessage = handleWorkerMessage
+  worker.value.postMessage({ type: "init", mode }) 
 
   worker.value.onmessage = (e) => {
     const { type, text, tokens, error: err } = e.data;
@@ -82,12 +88,12 @@ function generateCaption(url) {
   clearError()
   output.value = "Caption is generating..."
 
-
   if (!videoActive.value) activeTab.value = 'image'
 
   const promptText = customPrompt.value.trim() || "Describe this image in one line."
   worker.value.postMessage({ type: "caption", url, prompt: promptText })
 }
+
 
 
 function triggerFileInput() { if (activeTab.value === "image") fileInput.value.click() }
@@ -115,6 +121,29 @@ function handleVideoFile(e) {
     videoRef.value.srcObject = null
     videoRef.value.src = url
     videoRef.value.play().catch(err => setError(err.message))
+  }
+}
+
+function handleWorkerMessage(e) {
+  const { type, text, tokens, error: err } = e.data
+
+  if (type === "ready") modelLoading.value = false
+
+  if (type === "progress") {
+    // live caption
+    output.value = text
+    if (tokens !== undefined) progress.value = tokens
+  }
+
+  if (type === "caption") {
+    output.value = text
+    isGenerating = false
+  }
+
+  if (type === "error") {
+    setError(err)
+    isGenerating = false
+    modelLoading.value = false
   }
 }
 
@@ -220,7 +249,17 @@ function stopCapturingFrames() {
       <template v-else-if="error">
         <div style="background-color:#6b6767; padding:1rem; border-radius:10px; max-height:150px; overflow-y:auto; font-size:0.9rem;">
           <p style="font-family:consolas;">Error Occurred: {{ error }}</p>
+
+          <p style="font-size:small; font-family: consolas;">Note : This program has been tested in various machine and has no error , If you are facing error it must be due to hardware limitation prefer the cpu option</p>
+    <router-link to="/vlm?mode=cpu">
+    <button 
+       
+        style="margin-top:8px; padding:6px 12px; border:none; border-radius:6px; background:#333; color:white; cursor:pointer;">
+        Use CPU Mode
+      </button>
+      </router-link>
         </div>
+       
       </template>
     </div>
   </div>

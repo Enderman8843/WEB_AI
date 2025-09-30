@@ -8,33 +8,38 @@ import {
 let processor = null;
 let model = null;
 let isModelLoaded = false;
+let modelMode = "webgpu";
 
-async function initializeModel() {
+async function initializeModel(mode) {
   if (isModelLoaded) return;
+
+  modelMode = mode || "webgpu";
 
   postMessage({ type: "progress", text: "Loading processor...", tokens: 20 });
   processor = await AutoProcessor.from_pretrained("onnx-community/FastVLM-0.5B-ONNX");
 
   postMessage({ type: "progress", text: "Loading model...", tokens: 60 });
-  model = await AutoModelForImageTextToText.from_pretrained("onnx-community/FastVLM-0.5B-ONNX", {
-    device: "webgpu",
-    dtype: { embed_tokens: "fp16", vision_encoder: "q4", decoder_model_merged: "q4" }
-  });
+  model = await AutoModelForImageTextToText.from_pretrained(
+    "onnx-community/FastVLM-0.5B-ONNX",
+    {
+      device: modelMode, 
+    }
+  );
 
   isModelLoaded = true;
   postMessage({ type: "ready" });
 }
 
 onmessage = async (e) => {
-  const { type, url, prompt } = e.data;
+  const { type, mode, url, prompt } = e.data;
 
   if (type === "init") {
-    await initializeModel();
+    await initializeModel(mode);
   }
 
   if (type === "caption") {
     try {
-      await initializeModel();
+      await initializeModel(modelMode);
 
       const messages = [{ role: "user", content: `<image>${prompt}` }];
       const chatPrompt = processor.apply_chat_template(messages, { add_generation_prompt: true });
@@ -48,7 +53,7 @@ onmessage = async (e) => {
         skip_special_tokens: false,
         callback_function: text => {
           caption += text;
-          postMessage({ type: "progress", text: caption }); // live caption
+          postMessage({ type: "progress", text: caption }); 
         }
       });
 
