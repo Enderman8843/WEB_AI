@@ -20,17 +20,19 @@
 
 .btn-ic {
   display: inline-flex; 
-  gap:1rem;
+  gap: 1rem;
   align-items: center;         
   border-radius: 13px;
-  border-color: white;
-  border-style: solid;
+  border: 1px solid white;
   background-color: unset;
   padding: 0.5rem;         
   cursor: pointer;
   color: white;   
   font-size: 0.8rem;      
+  transition: all 0.3s ease; 
 }
+
+
 
 .btn-ice {
   display: flex;            
@@ -130,19 +132,7 @@
    flex-direction: row;
 }
 
-.card-m{
-  border-radius: 13px;
-  margin-top: 12px;
-  border-color:white;
-  border-style:solid;
-  color:white;
-  padding:1rem;
-  width: 70vw; 
-  height: 70vh; 
-  scrollbar-width: none; 
-  overflow-y: scroll; 
-  padding: 1rem;
-}
+
 
 
 @media (max-width: 768px) {
@@ -178,4 +168,32 @@
   border:none;
   background-color: #242424;
 }
+
+
+.tab-header {
+  display: flex;
+  border-bottom: 1px solid #555;
+  margin-bottom: 0.5rem;
+}
+
+.tab-header button {
+  flex: 1;
+  padding: 0.5rem;
+  background: #222;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.tab-header button.active {
+  background: #787777;
+  font-weight: bold;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 
