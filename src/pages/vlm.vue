@@ -230,6 +230,9 @@ function stopCapturingFrames() {
   <header style="display:flex; flex-direction: row; border-radius: 13px; border-width: 2px; border-color: white; border-style: solid; color: white; padding:0.5rem;">
     <a style="font-family:Noto Sans, sans-serif; font-weight:600; font-size: larger; margin:0.2rem">Lanthanum.AI</a>
     <div style="width:95%; display:flex; justify-content:flex-end; gap:0.5rem;">
+      <router-link to="/vlm?mode=wasm"><button class="btn-ic" ><span class="material-icons">memory</span>Use CPU Process</button></router-link>
+      <router-link to="/"><button class="btn-ic" ><span class="material-icons">chat</span>Chat mode</button></router-link>
+  
       <button class="btn-ic" @click="toggleSystemInfo">
         <span class="material-icons">computer</span>Stats
       </button>

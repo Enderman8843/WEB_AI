@@ -347,7 +347,7 @@ async function sendmsg () {
   <path d="M8 6.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m7 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
 </svg> <span style="font-size:xx-small; font-family: consolas;">A Live Vision Model Running in your broswer</span></div>
     </div> 
-    <p style="font-size:small; font-family: consolas;">Note: USE GPU or VLM feature as they are stable , don't prefer cpu as it is slow and time taking , it is there only as a failsafe</p>
+    <p style="font-size:small; font-family: consolas;">Note: USE GPU or VLM feature as they are stable , don't prefer cpu as it is slow and time taking , it is there only as a failsafe, VLM requires high ram and vram , pc may crash beware!!</p>
     </div> 
     
   </div>
