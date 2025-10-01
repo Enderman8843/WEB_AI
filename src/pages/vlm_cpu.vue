@@ -43,7 +43,7 @@ watch(activeTab, (newTab, oldTab) => {
 })
 
 onMounted(() => {
-  worker.value = new Worker(new URL('../worker_vlm.js', import.meta.url), { type: 'module' })
+  worker.value = new Worker(new URL('../worker_vlm_cpu.js', import.meta.url), { type: 'module' })
 
   worker.value.onmessage = (e) => {
     const { type, text, tokens, error: err } = e.data;
@@ -201,12 +201,13 @@ function stopCapturingFrames() {
   <header style="display:flex; flex-direction: row; border-radius: 13px; border-width: 2px; border-color: white; border-style: solid; color: white; padding:0.5rem;">
     <a style="font-family:Noto Sans, sans-serif; font-weight:600; font-size: larger; margin:0.2rem">Lanthanum.AI</a>
     <div style="width:95%; display:flex; justify-content:flex-end; gap:0.5rem;">
+      
       <router-link to="/">
       <button class="btn-ic" >
         <span class="material-icons">home</span>Home
       </button>
     </router-link>
-    <router-link to="/vlmc"><button class="btn-ic" ><span class="material-icons">memory</span>Use CPU</button></router-link>
+    <router-link to="/vlm"><button class="btn-ic" ><span class="material-icons">memory</span>Use GPU</button></router-link>
       <button class="btn-ic" @click="toggleSystemInfo">
         <span class="material-icons">computer</span>Stats
       </button>
@@ -221,7 +222,7 @@ function stopCapturingFrames() {
         <h3 style="color:white;">Loading Model...</h3>
         <progress_bar :progress="progress" />
         <p style="color:white;">{{ progress }}%</p>
-        <p style="color:gray; font-size:0.9rem;">This may take up to 1–2 minutes</p>
+        <p style="color:gray; font-size:0.9rem;">Note : This model works properly with webGPU , cpu support is quite unstable so you may get out of memeory or unable to start it</p>
       </template>
       <template v-else-if="error">
     <div>
@@ -231,7 +232,7 @@ function stopCapturingFrames() {
     <p style="font-family: consolas;">Error Occured: {{ error }}</p>
     </div>
     
-    <p style="font-size:small; font-family: consolas;">Note : This program has been tested in various machine and has no error , If you are facing error it must be due to hardware limitation prefer the cpu option</p>
+    <p style="font-size:small; font-family: consolas;">Note : This model works properly with webGPU , cpu support is quite unstable so you may get out of memeory or unable to start it</p>
     <router-link to="/cpu">
     <button 
        
@@ -239,7 +240,6 @@ function stopCapturingFrames() {
         Use CPU
       </button>
       </router-link>
-      <router-link to="/"><button class="btn-ic" style="margin:10px" ><span class="material-icons">home</span>Go to home</button></router-link>
         </div>
     </template>
     </div>
@@ -306,7 +306,7 @@ function stopCapturingFrames() {
         <img v-if="previewUrl && !videoActive" :src="previewUrl" alt="Preview" style="max-width:100%; max-height:100%; object-fit:contain;" />
         <video v-show="videoActive" ref="videoRef" autoplay muted playsinline style="max-width:100%; max-height:100%; background:black; object-fit:contain;"></video>
       </div>
-     
+
       <div class="card" style="flex:0.5; padding:1rem; background:#242424; color:white; overflow-y:auto; display:flex; flex-direction:column;">
         <a>Caption:</a>
         {{ output }}
